@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>烟花庆祝页面</title>
+		<style>
+			body {
+				margin: 0;
+				overflow: hidden;
+				background: #000;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				color: #fff;
+				font-family: 'Arial', sans-serif;
+				text-align: center;
+			}
+
+			h1 {
+				font-size: 3rem;
+				margin-bottom: 1rem;
+				animation: glow 1.5s infinite alternate;
+			}
+
+			h2 {
+				font-size: 1.5rem;
+				margin-top: 0;
+				color: #ffa500;
+				text-shadow: 0 0 10px #ffa500, 0 0 20px #ff4500;
+			}
+
+			@keyframes glow {
+				from {
+					text-shadow: 0 0 10px #ff0, 0 0 20px #ff0, 0 0 30px #ff0;
+				}
+				to {
+					text-shadow: 0 0 20px #f00, 0 0 30px #f00, 0 0 40px #f00;
+				}
+			}
+
+			canvas {
+				position: absolute;
+				top: 0;
+				left: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>祝世腾蒸蒸日上，事业辉煌！</h1>
+		<h2>愿我们的团队再创佳绩，共同迎接美好未来！</h2>
+		<canvas id="fireworks"></canvas>
+
+		<script>
+			const canvas = document.getElementById('fireworks');
+			const ctx = canvas.getContext('2d');
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+
+			class Firework {
+				constructor(x, y, color) {
+					this.x = x;
+					this.y = y;
+					this.color = color;
+					this.particles = [];
+					for (let i = 0; i < 100; i++) {
+						this.particles.push(new Particle(x, y, color));
+					}
+				}
+
+				draw() {
+					this.particles.forEach(p => p.draw());
+				}
+
+				update() {
+					this.particles.forEach(p => p.update());
+				}
+			}
+
+			class Particle {
+				constructor(x, y, color) {
+					this.x = x;
+					this.y = y;
+					this.color = color;
+					this.alpha = 1;
+					this.size = Math.random() * 3 + 1;
+					this.speedX = (Math.random() - 0.5) * 8;
+					this.speedY = (Math.random() - 0.5) * 8;
+				}
+
+				draw() {
+					ctx.save();
+					ctx.globalAlpha = this.alpha;
+					ctx.fillStyle = this.color;
+					ctx.beginPath();
+					ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+					ctx.fill();
+					ctx.restore();
+				}
+
+				update() {
+					this.x += this.speedX;
+					this.y += this.speedY;
+					this.alpha -= 0.02;
+					if (this.alpha < 0) this.alpha = 0;
+				}
+			}
+
+			const fireworks = [];
+			function animate() {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				fireworks.forEach((fw, i) => {
+					fw.update();
+					fw.draw();
+					if (fw.particles[0].alpha <= 0) {
+						fireworks.splice(i, 1);
+					}
+				});
+				requestAnimationFrame(animate);
+			}
+
+			function createFirework(x, y) {
+				const colors = [
+					'#ff0000',
+					'#00ff00',
+					'#0000ff',
+					'#ffff00',
+					'#ff00ff',
+				];
+				const color = colors[Math.floor(Math.random() * colors.length)];
+				fireworks.push(new Firework(x, y, color));
+			}
+
+			window.addEventListener('click', e => {
+				createFirework(e.clientX, e.clientY);
+			});
+
+			window.addEventListener('resize', () => {
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
+			});
+
+			animate();
+		</script>
+	</body>
+</html>
